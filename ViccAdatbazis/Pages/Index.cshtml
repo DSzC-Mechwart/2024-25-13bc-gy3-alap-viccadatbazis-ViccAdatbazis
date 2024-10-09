@@ -4,7 +4,40 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<h1>Viccek</h1>
+
+<div id="jokeList">
+    <ul>
+        @foreach (var joke in Model.Jokes)
+        {
+            <li>
+                <strong>@joke.Tartalom</strong><br />
+                <em>Feltöltő: @joke.Feltolto</em><br />
+                <span>Lájkok: @joke.Tetszik</span> | <span>Diszlájkok: @joke.NemTetszik</span><br />
+                <button onclick="vote(@joke.Id, 'like')">Tetszik</button>
+                <button onclick="vote(@joke.Id, 'dislike')">Nem tetszik</button>
+            </li>
+        }
+    </ul>
 </div>
+
+@section Scripts {
+    <script>
+        async function vote(jokeId, type) {
+            const response = await fetch(`/api/jokes/${jokeId}/vote`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(type)
+            });
+
+            if (response.ok) {
+                const updatedJoke = await response.json();
+                location.reload(); // Frissíti az oldalt, hogy az új adatok megjelenjenek
+            } else {
+                alert('Hiba történt a szavazás során.');
+            }
+        }
+    </script>
+}

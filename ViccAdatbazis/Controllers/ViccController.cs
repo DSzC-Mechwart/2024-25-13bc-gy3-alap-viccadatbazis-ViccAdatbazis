@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using ViccAdatbazis.Data;
 using ViccAdatbazis.Models;
 
-[Route("api/[controller]")]
+[Route("Controllers/[controller]")]
 [ApiController]
 public class ViccController : ControllerBase
 {
