@@ -6,87 +6,91 @@ using System.Threading.Tasks;
 using ViccAdatbazis.Data;
 using ViccAdatbazis.Models;
 
-[Route("Controllers/[controller]")]
-[ApiController]
-public class ViccController : ControllerBase
+namespace ViccAdatbazis.Controllers
 {
-    private readonly ViccDbContext _context;
-
-    public ViccController(ViccDbContext context)
+    [Route("api/[Controller]")]
+    [ApiController]
+    public class ViccController : ControllerBase
     {
-        _context = context;
-    }
+        //adatbazis kapcsolat
+        private readonly ViccDbContext _context;
 
-    // GET: api/viccs
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<Vicc>>> GetVicc(int page = 1)
-    {
-        int pageSize = 10;
-        var viccek = await _context.Viccek
-            .Where(j => j.Aktiv)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync();
-
-        return Ok(viccek);
-    }
-
-    // POST: api/viccs
-    [HttpPost]
-    public async Task<ActionResult<Vicc>> PostVicc([FromBody] Vicc vicc)
-    {
-        if (!ModelState.IsValid)
+        public ViccController(ViccDbContext context)
         {
-            return BadRequest(ModelState);
+            _context = context;
         }
 
-        _context.Viccek.Add(vicc);
-        await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetVicc), new { id = vicc.Id }, vicc);
-    }
 
-    // POST: api/viccs/{id}/vote
-    [HttpPost("{id}/vote")]
-    public async Task<ActionResult<Vicc>> VoteVicc(int id, [FromBody] string type)
-    {
-        var vicc = await _context.Viccek.FindAsync(id);
-        if (vicc == null) return NotFound();
 
-        if (type == "like")
+
+        // vicc listazas
+        [HttpGet]
+        public async Task<ActionResult<List<Vicc>>> GetViccek()
         {
-            vicc.Tetszik++;
-        }
-        else if (type == "dislike")
-        {
-            vicc.NemTetszik++;
+            return await _context.Viccek.Where(x=>x.Aktiv).ToListAsync();
         }
 
-        await _context.SaveChangesAsync();
-        return Ok(vicc);
-    }
+        // egy vicc lekerdezese
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Vicc>> GetVicc(int id)
+        {
+            var vicc = await _context.Viccek.FindAsync(id);
+            if (vicc == null)
+            {
+                return NotFound();
+            }
+            return vicc;
+        }
 
-    // PUT: api/viccs/{id}
-    [HttpPut("{id}")]
-    public async Task<IActionResult> PutVicc(int id, [FromBody] Vicc vicc)
-    {
-        if (id != vicc.Id) return BadRequest();
+        // ujvicc feltoltese
+        [HttpPost]
+        public async Task<ActionResult> PostVicc(Vicc ujVicc)
+        {
+            _context.Viccek.Add(ujVicc);
+            await _context.SaveChangesAsync();
 
-        _context.Entry(vicc).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
+            return CreatedAtAction("GetVicc", new {id = ujVicc.Id}, ujVicc);
+        }
 
-        return NoContent();
-    }
+        // vicc modositasa
+        [HttpPut("{id}")]
+        public async Task<ActionResult> PutVicc(int id, Vicc modositottVicc)
+        {
+            if (id != modositottVicc.Id)
+            {
+                return BadRequest();
+            }
 
-    // DELETE: api/viccs/{id}
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteVicc(int id)
-    {
-        var vicc = await _context.Viccek.FindAsync(id);
-        if (vicc == null) return NotFound();
+            _context.Entry(modositottVicc).State = EntityState.Modified;
 
-        vicc.Aktiv = true;
-        await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
-        return NoContent();
+            return NoContent();
+        }
+
+
+        // vicc torlese
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteVicc(int id)
+        {
+            var torlendoVicc = await _context.Viccek.FindAsync(id);
+            if(torlendoVicc == null) 
+            { 
+                return NotFound(); 
+            }
+            if (torlendoVicc.Aktiv)
+            {
+                torlendoVicc.Aktiv = false;
+            }
+            else
+            {
+                _context.Viccek.Remove(torlendoVicc);
+            }
+
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
+
     }
 }
