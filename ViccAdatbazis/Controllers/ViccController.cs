@@ -15,6 +15,8 @@ namespace ViccAdatbazis.Controllers
         //adatbazis kapcsolat
         private readonly ViccDbContext _context;
 
+
+        //ctor (parameter atadas)
         public ViccController(ViccDbContext context)
         {
             _context = context;
@@ -81,6 +83,7 @@ namespace ViccAdatbazis.Controllers
             if (torlendoVicc.Aktiv)
             {
                 torlendoVicc.Aktiv = false;
+                _context.Entry(torlendoVicc).State = EntityState.Modified;
             }
             else
             {
