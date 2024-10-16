@@ -29,7 +29,7 @@ namespace ViccAdatbazis.Controllers
         [HttpGet]
         public async Task<ActionResult<List<Vicc>>> GetViccek()
         {
-            return await _context.Viccek.Where(x=>x.Aktiv).ToListAsync();
+            return await _context.Viccek.Where(x => x.Aktiv).ToListAsync();
         }
 
         // egy vicc lekerdezese
@@ -51,7 +51,7 @@ namespace ViccAdatbazis.Controllers
             _context.Viccek.Add(ujVicc);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetVicc", new {id = ujVicc.Id}, ujVicc);
+            return CreatedAtAction("GetVicc", new { id = ujVicc.Id }, ujVicc);
         }
 
         // vicc modositasa
@@ -76,9 +76,9 @@ namespace ViccAdatbazis.Controllers
         public async Task<ActionResult> DeleteVicc(int id)
         {
             var torlendoVicc = await _context.Viccek.FindAsync(id);
-            if(torlendoVicc == null) 
-            { 
-                return NotFound(); 
+            if (torlendoVicc == null)
+            {
+                return NotFound();
             }
             if (torlendoVicc.Aktiv)
             {
@@ -95,5 +95,25 @@ namespace ViccAdatbazis.Controllers
         }
 
 
+
+        //Vicc like
+        [Route("{id}/like")] //https://localhost/api/Vicc/1/like
+        [HttpPatch("{id}")]
+        public async Task<ActionResult<string>> Lajkolas(int id)
+        {
+            var vicc = _context.Viccek.Find(id);
+            if (vicc == null)
+            {
+                return NotFound();
+            }
+            vicc.Tetszik++;
+            _context.Entry(vicc).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return Ok(vicc.Tetszik);
+
+            //Vicc dislike
+
+
+        }
     }
 }
