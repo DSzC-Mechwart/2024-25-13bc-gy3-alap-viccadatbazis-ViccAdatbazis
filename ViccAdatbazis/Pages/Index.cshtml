@@ -4,7 +4,19 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<h1>Viccek</h1>
+
+<div id="jokeList">
+    <ul>
+        @foreach (var joke in Model.Jokes)
+        {
+            <li>
+                <strong>@joke.Tartalom</strong><br />
+                <em>Feltöltő: @joke.Feltolto</em><br />
+                Lájkok: <span id="likeDb">@joke.Tetszik</span> | <span>Diszlájkok: @joke.NemTetszik</span><br />
+                <button onclick="lajkolas(@joke.Id)">Tetszik</button>
+                <button onclick="lajkolas(@joke.Id, 'dislike')">Nem tetszik</button>
+            </li>
+        }
+    </ul>
 </div>

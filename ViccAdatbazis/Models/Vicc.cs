@@ -1,4 +1,6 @@
-﻿namespace ViccAdatbazis.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ViccAdatbazis.Models
 {
     public class Vicc
     {
